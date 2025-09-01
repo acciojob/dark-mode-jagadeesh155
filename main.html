@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dark Mode Preference</title>
+  <title>Dark Mode + Form</title>
   <style>
-    /* Default light theme */
+    /* Light theme */
     body {
       background-color: white;
       color: black;
@@ -19,7 +19,7 @@
       color: #e0e0e0;
     }
 
-    button {
+    button, input[type="button"] {
       padding: 10px 20px;
       border: none;
       border-radius: 8px;
@@ -27,26 +27,46 @@
       margin-bottom: 20px;
     }
 
-    body.dark button {
+    body.dark button, body.dark input[type="button"] {
       background-color: #333;
       color: #fff;
     }
 
-    body button {
+    body button, body input[type="button"] {
       background-color: #ddd;
       color: #000;
+    }
+
+    input {
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 <body>
+  <!-- Dark Mode Toggle -->
   <button id="toggleTheme">Toggle Dark Mode</button>
-  <h1>Welcome!</h1>
-  <p>Your theme preference will be remembered across visits.</p>
+
+  <!-- User Form -->
+  <form id="userForm">
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" /><br>
+
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" /><br>
+
+    <label for="phone">Phone:</label><br>
+    <input type="text" id="phone" /><br><br>
+
+    <input type="button" id="submitBtn" value="Submit" />
+  </form>
 
   <script>
+    // ---------------- Dark Mode Logic ----------------
     const toggleBtn = document.getElementById('toggleTheme');
 
-    // Function to update button text
     function updateButton() {
       toggleBtn.textContent = document.body.classList.contains('dark') 
         ? "Switch to Light Mode" 
@@ -58,22 +78,41 @@
     if (savedTheme === 'dark') {
       document.body.classList.add('dark');
     } else if (!savedTheme) {
-      // No saved preference, use system preference
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         document.body.classList.add('dark');
       }
     }
-
     updateButton();
 
-    // Toggle dark mode manually
     toggleBtn.addEventListener('click', () => {
       document.body.classList.toggle('dark');
-
-      // Save preference
       localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-
       updateButton();
+    });
+
+    // ---------------- Form Logic ----------------
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Populate form from localStorage if exists
+    const savedForms = JSON.parse(localStorage.getItem('forms')) || [];
+    if (savedForms.length > 0) {
+      const lastForm = savedForms[savedForms.length - 1];
+      document.getElementById('name').value = lastForm.name;
+      document.getElementById('email').value = lastForm.email;
+      document.getElementById('phone').value = lastForm.phone;
+    }
+
+    // Save form data on submit
+    submitBtn.addEventListener('click', () => {
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+
+      const forms = JSON.parse(localStorage.getItem('forms')) || [];
+      forms.push({ name, email, phone });
+      localStorage.setItem('forms', JSON.stringify(forms));
+
+      alert('Form saved to Local Storage!');
     });
   </script>
 </body>
